@@ -90,11 +90,13 @@ then
   echo "Adding trailing slash NEW_SUBTREE_PATH=${NEW_SUBTREE_PATH}"
 fi
 
-# OLD_SUBTREE_PATH must have a trailing slash.
-if [[ "${OLD_SUBTREE_PATH}" != */ ]]; 
+# OLD_SUBTREE_PATH must have a trailing slash unless it is empty (then it stays empty)
+if [[ "${OLD_SUBTREE_PATH}" != */ ]] && [[ "${OLD_SUBTREE_PATH}" != "" ]]; 
 then
   OLD_SUBTREE_PATH=${OLD_SUBTREE_PATH}/
   echo "Adding trailing slash OLD_SUBTREE_PATH=${OLD_SUBTREE_PATH}"
+else
+  OLD_SUBTREE_PATH=""
 fi
 
 verifyPreconditions() {
@@ -182,7 +184,7 @@ importFolderFromAnotherGitRepo() {
     pushd "${LOCAL_DST_GIT_REPO}" &&
       echo "-- Current working directory: ${LOCAL_DST_GIT_REPO}" &&
       echo "-- Adding git remote pointing to '${LOCAL_SRC_GIT_REPO}'..." &&
-      OLD_REPO=old-repo-`cat /dev/urandom | tr -dc '[:alpha:]' | fold -w ${1:-10} | head -n 1`
+      OLD_REPO=old-repo-`cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1`
       git remote add ${OLD_REPO} ${LOCAL_SRC_GIT_REPO} &&
       echo "-- Fetching from ${LOCAL_SRC_GIT_REPO}..." &&
       git fetch ${OLD_REPO} "${SOURCE_BRANCH_EXPORTED}" &&
